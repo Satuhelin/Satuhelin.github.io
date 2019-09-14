@@ -1,0 +1,1576 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <script type="text/javascript">
+        (function() {
+            // only want one resizer on the page
+            if (document.documentElement.className.indexOf("g-resizer-v3-init") > -1) return;
+            document.documentElement.className += " g-resizer-v3-init";
+            // require IE9+
+            if (!("querySelector" in document)) return;
+            function resizer() {
+                var elements = Array.prototype.slice.call(document.querySelectorAll(".g-artboard[data-min-width]")),
+                    widthById = {};
+                elements.forEach(function(el) {
+                    var parent = el.parentNode,
+                        width = widthById[parent.id] || parent.getBoundingClientRect().width,
+                        minwidth = el.getAttribute("data-min-width"),
+                        maxwidth = el.getAttribute("data-max-width");
+                    widthById[parent.id] = width;
+                    if (+minwidth <= width && (+maxwidth >= width || maxwidth === null)) {
+                        el.style.display = "block";
+                    } else {
+                        el.style.display = "none";
+                    }
+                });
+                try {
+                    if (window.parent && window.parent.$) {
+                        window.parent.$("body").trigger("resizedcontent", [window]);
+                    }
+                    if (window.require) {
+                        require(['foundation/main'], function() {
+                            require(['shared/interactive/instances/app-communicator'], function(AppCommunicator) {
+                                AppCommunicator.triggerResize();
+                            });
+                        });
+                    }
+                } catch(e) { console.log(e); }
+            }
+            document.addEventListener('DOMContentLoaded', resizer);
+            // feel free to replace throttle with _.throttle, if available
+            window.addEventListener('resize', throttle(resizer, 200));        
+            function throttle(func, wait) {
+                // from underscore.js
+                var _now = Date.now || function() { return new Date().getTime(); },
+                    context, args, result, timeout = null, previous = 0;
+                var later = function() {
+                    previous = _now();
+                    timeout = null;
+                    result = func.apply(context, args);
+                    if (!timeout) context = args = null;
+                };
+                return function() {
+                    var now = _now(), remaining = wait - (now - previous);
+                    context = this;
+                    args = arguments;
+                    if (remaining <= 0 || remaining > wait) {
+                        if (timeout) {
+                            clearTimeout(timeout);
+                            timeout = null;
+                        }
+                        previous = now;
+                        result = func.apply(context, args);
+                        if (!timeout) context = args = null;
+                    } else if (!timeout && options.trailing !== false) {
+                        timeout = setTimeout(later, remaining);
+                    }
+                    return result;
+                };
+            }
+           
+        })();
+    </script>
+      
+    <style>
+        body {
+            margin:auto;
+            padding:50px 10px;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .serif {
+            font-family: 'Lora', serif;
+        }
+        .sans-serif {
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        /* choose a light or dark theme to add to the body tag. */
+        .dark-theme {
+            background-color: #151515;
+            color: #fbfbfb;
+        }
+        .light-theme {
+            background-color: white;
+            color: black;
+        }
+
+        .header {
+            padding-top:20px;
+            padding-bottom:20px;
+        }
+
+        .story-body, .header, .chart-section, .footer {
+            margin:auto;
+            max-width: 700px;
+        }
+
+        .footer {
+            padding-top:20px;
+            padding-bottom:20px;
+        }
+
+        .chart-section.wide{
+            width:100%;
+            max-width:1200px;
+        }
+
+        .chart-section.wide p.chart-title {
+            width:100%;
+            max-width:700px;
+            margin-left:auto;
+            margin-right:auto;
+        }
+        .chart-section.wide p.chart-subhead {
+            width:100%;
+            max-width:700px;
+            margin-left:auto;
+            margin-right:auto;
+        }
+
+
+        /* text styles */
+
+        p.kicker {
+            font-size:1rem;
+            text-transform:uppercase;
+        }
+
+        .text-center {
+            text-align:center;
+        }
+
+        h1.headline {
+            font-size: 4rem;
+            line-height: 1.1;
+            margin-bottom: 0.25rem;
+            margin-top: 1rem;
+            font-weight: 800;
+        }
+
+        h2.subhead {
+            font-size: 1.4rem;
+            line-height: 2rem;
+            margin-bottom:0;
+            margin-top: 15px;
+            font-weight: 400;
+        }
+
+        p.body-text {
+            font-size: 1.1rem;
+            line-height: 1.4;
+            margin-top:0;
+            margin-bottom:15px;
+        }
+
+        h3.section-head {
+            font-size:2rem;
+            margin:40px 0 10px 0;
+            font-weight:700;
+            line-height:1.3;
+        }
+
+        .byline {
+            font-size: 1.1rem;
+            line-height: 0.75;
+            margin-top: 1.5rem;
+            font-weight: 500;
+        }
+
+        .date {
+            font-size: 0.85rem;
+            line-height: 1;
+            margin-top: 10px;
+            font-weight:400;
+            text-transform:uppercase;
+            letter-spacing:0.5px;
+        }
+
+
+        p.note {
+            font-size:0.85rem;
+        }
+
+        /* chart styles */
+
+        .chart-section {
+            width:100%;
+            max-width:1200px;
+            padding:20px 0px;
+        }
+
+        .story-body .chart-section {
+            padding-top:0px;
+        }
+
+
+        .chart-row {
+            display:flex;
+            justify-content: space-between;
+            margin-top:20px;
+        }
+
+        p.chart-title {
+            font-size:1.3rem;
+            font-weight:700;
+            max-width:700px;
+            margin:0px auto 5px auto;
+        }
+        p.chart-subhead {
+            margin:0 auto;
+            max-width:700px;
+            font-size:1rem;
+            margin-bottom:15px;
+        }
+
+        p.chart-label {
+            margin:0 0 5px 0;
+            font-size:0.85rem;
+            text-transform:uppercase;
+            font-weight:600;
+        }
+
+        .chart-row .chart {
+            width:100%;
+            padding-right:15px;
+            min-width:calc(25% - 15px);
+
+        }
+
+
+
+        p.chart-source {
+            font-size:0.85rem;
+            margin:0;
+        }
+
+
+
+
+
+        /* photos */
+
+        .photo-section {
+            padding:30px 0px;
+            width:100%;
+            margin:auto;
+            display:flex;
+            max-width:1200px;
+        }
+
+        .photo {
+            width:100%;
+            padding-right:15px;
+        }
+        .photo img {
+            width:100%;	
+        }
+
+        p.caption {
+            font-size:0.9rem;
+            margin:0;
+        }
+
+
+
+        /* mobile */
+
+        @media (max-width:700px) {
+
+            .chart-row {
+                display:block;
+            }
+
+            .chart-row .chart {
+                padding:0;
+            }
+
+            .photo-section {
+                display:block;
+            }
+            .photo {
+                padding:0;
+            }
+
+        }
+
+        #g-templates-laptop, #g-templates-medium, #g-templates-mobile {
+            display: none;
+        }
+
+        @media (max-width: 490px) {
+            #g-templates-mobile {
+                display: block;
+            }
+        }
+
+        @media (min-width: 490px) and (max-width: 620px) {
+            #g-templates-laptop {
+                display: block;
+            }
+        }
+
+        @media (min-width: 620px)  {
+            #g-templates-medium {
+                display: block;
+            }
+        }
+
+    </style>
+    
+    <!-- google fonts: Open Sans (sans-serif) and Lora (serif) -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i,800,800i&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Lora:400,400i,700&display=swap" rel="stylesheet">
+      
+    <title>This is your title</title>
+  </head>
+
+  <body class="light-theme"> <!-- all of the content on your html page goes inside the body -->
+
+    <div class="header">
+      <p class="kicker">Optional kicker</p>
+      <h1 class="headline">Female Comic Characters Are Girls That Can Fly and Cry</h1>
+      <h2 class="subhead">The remake of the story by Amanda Shendruk published by Pudding</h2>
+      <p class="byline">By Satu Helin</p>
+      <p class="date">Published September 13, 2019</p>
+    </div>
+
+    <div class="story-body">
+      <p class="body-text serif">We know that the majority of comic book heros are men but still among almost 35 000 comic characters, there were 5790 female super heros. Let's look at who they are!</p>
+      <p class="body-text serif">First, let's see, how the superpowerful female comic characters are called. Around 10 percent of all hero names are related to gender. The biggest favourite is the ending "man". How original. </p>
+      <p class="body-text serif"> For women the most popular gender-pattern is "Lady". Women have more variation in theri names than men but female names are more often related to family ("Sister", "mother, "Mrs.") than to the status or position. </p>
+    </div>
+
+    <div class="chart-section">
+        <div class="chart-row">
+          <div class="chart">
+
+
+
+
+            <!--- PASTE YOUR AI2HTML AFTER THIS LINE -->
+
+
+<!-- Generated by ai2html v0.89.0 - 2019-09-13 20:56 -->
+<!-- ai file: templates5.ai -->
+<style type='text/css' media='screen,print'>
+	#g-templates5-box .g-artboard {
+		margin:0 auto;
+	}
+	#g-templates5-box p {
+		margin:0;
+	}
+	.g-aiAbs {
+		position:absolute;
+	}
+	.g-aiImg {
+		display:block;
+		width:100% !important;
+	}
+	.g-aiSymbol {
+		position: absolute;
+		box-sizing: border-box;
+	}
+	.g-aiPointText p { white-space: nowrap; }
+	#g-templates5-medium {
+		position:relative;
+		overflow:hidden;
+	}
+	#g-templates5-medium p {
+		font-family:arial,helvetica,sans-serif;
+		font-size:12px;
+		line-height:14px;
+		height:auto;
+		filter:alpha(opacity=100);
+		-ms-filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
+		opacity:1;
+		letter-spacing:0em;
+		text-align:left;
+		color:rgb(0,0,0);
+		text-transform:none;
+		padding-bottom:0;
+		padding-top:0;
+		mix-blend-mode:normal;
+		font-style:normal;
+		position:static;
+	}
+	#g-templates5-medium .g-pstyle0 {
+		font-weight:bold;
+		font-size:18px;
+		line-height:22px;
+	}
+	#g-templates5-medium .g-pstyle1 {
+		font-style:italic;
+		font-size:14px;
+		line-height:17px;
+	}
+	#g-templates5-medium .g-pstyle2 {
+		font-weight:bold;
+	}
+	#g-templates5-medium .g-pstyle3 {
+		height:14px;
+	}
+	#g-templates5-medium .g-pstyle4 {
+		height:14px;
+		color:rgb(193,39,45);
+	}
+	#g-templates5-medium .g-pstyle5 {
+		font-size:10px;
+		line-height:12px;
+	}
+	#g-templates5-laptop {
+		position:relative;
+		overflow:hidden;
+	}
+	#g-templates5-laptop p {
+		font-family:arial,helvetica,sans-serif;
+		font-size:13px;
+		line-height:15px;
+		height:auto;
+		filter:alpha(opacity=100);
+		-ms-filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
+		opacity:1;
+		letter-spacing:0em;
+		text-align:left;
+		color:rgb(0,0,0);
+		text-transform:none;
+		padding-bottom:0;
+		padding-top:0;
+		mix-blend-mode:normal;
+		font-style:normal;
+		position:static;
+	}
+	#g-templates5-laptop .g-pstyle0 {
+		font-weight:bold;
+		font-size:19px;
+		line-height:23px;
+	}
+	#g-templates5-laptop .g-pstyle1 {
+		font-style:italic;
+		font-size:15px;
+		line-height:18px;
+	}
+	#g-templates5-laptop .g-pstyle2 {
+		font-weight:bold;
+	}
+	#g-templates5-laptop .g-pstyle3 {
+		height:15px;
+	}
+	#g-templates5-laptop .g-pstyle4 {
+		font-size:12px;
+		line-height:14px;
+		height:14px;
+	}
+	#g-templates5-laptop .g-pstyle5 {
+		height:15px;
+		color:rgb(193,39,45);
+	}
+	#g-templates5-laptop .g-pstyle6 {
+		font-size:10px;
+		line-height:12px;
+	}
+	#g-templates5-mobile {
+		position:relative;
+		overflow:hidden;
+	}
+	#g-templates5-mobile p {
+		font-family:arial,helvetica,sans-serif;
+		font-size:12px;
+		line-height:14px;
+		height:auto;
+		filter:alpha(opacity=100);
+		-ms-filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
+		opacity:1;
+		letter-spacing:0em;
+		text-align:left;
+		color:rgb(0,0,0);
+		text-transform:none;
+		padding-bottom:0;
+		padding-top:0;
+		mix-blend-mode:normal;
+		font-style:normal;
+		position:static;
+	}
+	#g-templates5-mobile .g-pstyle0 {
+		font-weight:bold;
+		font-size:18px;
+		line-height:22px;
+	}
+	#g-templates5-mobile .g-pstyle1 {
+		font-style:italic;
+		font-size:13px;
+		line-height:16px;
+	}
+	#g-templates5-mobile .g-pstyle2 {
+		font-weight:bold;
+	}
+	#g-templates5-mobile .g-pstyle3 {
+		font-weight:bold;
+		font-size:14px;
+		line-height:17px;
+	}
+	#g-templates5-mobile .g-pstyle4 {
+		font-weight:bold;
+		font-size:14px;
+		line-height:17px;
+		height:17px;
+	}
+	#g-templates5-mobile .g-pstyle5 {
+		height:14px;
+	}
+	#g-templates5-mobile .g-pstyle6 {
+		font-size:8px;
+		line-height:10px;
+		height:10px;
+	}
+
+</style>
+
+<div id="g-templates5-box" class="ai2html">
+
+	<!-- Artboard: medium -->
+	<div id="g-templates5-medium" class="g-artboard" style="width:620px; height:449.237288135593px;" data-aspect-ratio="1.38" data-min-width="620">
+		<img id="g-templates5-medium-img" class="g-aiImg g-aiAbs" alt="" src="templates5-medium.png"/>
+		<div id="g-ai0-1" class="g-ai2html-settings g-aiAbs" style="top:6.2328%;left:5.4921%;width:93.0645%;">
+			<p class="g-pstyle0">Batman and Dream Girl</p>
+			<p class="g-pstyle1">10 most common gendered name-patterns of 2 400 comic characters</p>
+			<p>&nbsp;</p>
+			<p>&nbsp;</p>
+		</div>
+		<div id="g-ai0-2" class="g-ai2html-settings g-aiAbs" style="top:19.3662%;left:34.0487%;width:17.2581%;">
+			<p class="g-pstyle2">Female</p>
+		</div>
+		<div id="g-ai0-3" class="g-ai2html-settings g-aiAbs" style="top:19.3662%;left:52.4576%;width:13.7097%;">
+			<p class="g-pstyle2">Male</p>
+		</div>
+		<div id="g-ai0-4" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:30.963%;margin-top:-8.1px;left:89.5161%;width:45px;">
+			<p class="g-pstyle3">man</p>
+		</div>
+		<div id="g-ai0-5" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:34.9698%;margin-top:-8.1px;left:23.2177%;width:44px;">
+			<p class="g-pstyle3">lady</p>
+		</div>
+		<div id="g-ai0-6" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:39.8669%;margin-top:-8.1px;left:23.773%;width:45px;">
+			<p class="g-pstyle3">mrs.</p>
+		</div>
+		<div id="g-ai0-7" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:39.8669%;margin-top:-8.1px;left:76.7316%;width:39px;">
+			<p class="g-pstyle3">mr.</p>
+		</div>
+		<div id="g-ai0-8" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:41.4251%;margin-top:-8.1px;left:61.7185%;width:44px;">
+			<p class="g-pstyle3">king</p>
+		</div>
+		<div id="g-ai0-9" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:44.7641%;margin-top:-8.1px;left:24.9404%;width:38px;">
+			<p class="g-pstyle3">girl</p>
+		</div>
+		<div id="g-ai0-10" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:46.0997%;margin-top:-8.1px;left:59.7388%;width:42px;">
+			<p class="g-pstyle3">lord</p>
+		</div>
+		<div id="g-ai0-11" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:49.4387%;margin-top:-8.1px;left:22.789%;width:55px;">
+			<p class="g-pstyle3">queen</p>
+		</div>
+		<div id="g-ai0-12" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:50.1065%;margin-top:-8.1px;left:59.4088%;width:59px;">
+			<p class="g-pstyle3">master</p>
+		</div>
+		<div id="g-ai0-13" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:51.4421%;margin-top:-8.1px;left:76.518%;width:97px;">
+			<p class="g-pstyle4">Men, not boys</p>
+		</div>
+		<div id="g-ai0-14" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:54.1133%;margin-top:-8.1px;left:3.0864%;width:112px;">
+			<p class="g-pstyle4">Girls, not women</p>
+		</div>
+		<div id="g-ai0-15" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:54.3359%;margin-top:-8.1px;left:31.8257%;width:47px;">
+			<p class="g-pstyle3">miss</p>
+		</div>
+		<div id="g-ai0-16" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:55.0037%;margin-top:-8.1px;left:56.8516%;width:41px;">
+			<p class="g-pstyle3">boy</p>
+		</div>
+		<div id="g-ai0-17" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:59.2331%;margin-top:-8.1px;left:32.9335%;width:51px;">
+			<p class="g-pstyle3">sister</p>
+		</div>
+		<div id="g-ai0-18" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:59.9009%;margin-top:-8.1px;left:53.6282%;width:52px;">
+			<p class="g-pstyle3">junior</p>
+		</div>
+		<div id="g-ai0-19" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:64.1303%;margin-top:-8.1px;left:31.5875%;width:61px;">
+			<p class="g-pstyle3">woman</p>
+		</div>
+		<div id="g-ai0-20" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:65.4659%;margin-top:-8.1px;left:53.1396%;width:53px;">
+			<p class="g-pstyle3">baron</p>
+		</div>
+		<div id="g-ai0-21" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:69.0275%;margin-top:-8.1px;left:31.7747%;width:62px;">
+			<p class="g-pstyle3">madam</p>
+		</div>
+		<div id="g-ai0-22" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:71.2535%;margin-top:-8.1px;left:52.5622%;width:60px;">
+			<p class="g-pstyle3">brother</p>
+		</div>
+		<div id="g-ai0-23" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:73.9247%;margin-top:-8.1px;left:31.3299%;width:67px;">
+			<p class="g-pstyle3">princess</p>
+		</div>
+		<div id="g-ai0-24" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:77.4863%;margin-top:-8.1px;left:52.5622%;width:55px;">
+			<p class="g-pstyle3">prince</p>
+		</div>
+		<div id="g-ai0-25" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:78.8219%;margin-top:-8.1px;left:33.0477%;width:60px;">
+			<p class="g-pstyle3">mother</p>
+		</div>
+		<div id="g-ai0-26" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:89.9518%;margin-top:-8.1px;left:3.6279%;width:46px;">
+			<p class="g-pstyle3">30%</p>
+		</div>
+		<div id="g-ai0-27" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:89.9518%;margin-top:-8.1px;left:17.6593%;width:46px;">
+			<p class="g-pstyle3">20%</p>
+		</div>
+		<div id="g-ai0-28" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:89.9518%;margin-top:-8.1px;left:31.6908%;width:46px;">
+			<p class="g-pstyle3">10%</p>
+		</div>
+		<div id="g-ai0-29" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:89.9518%;margin-top:-8.1px;left:46.1708%;width:39px;">
+			<p class="g-pstyle3">0%</p>
+		</div>
+		<div id="g-ai0-30" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:89.9518%;margin-top:-8.1px;left:59.7537%;width:46px;">
+			<p class="g-pstyle3">10%</p>
+		</div>
+		<div id="g-ai0-31" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:89.9518%;margin-top:-8.1px;left:73.7852%;width:46px;">
+			<p class="g-pstyle3">20%</p>
+		</div>
+		<div id="g-ai0-32" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:89.9518%;margin-top:-8.1px;left:87.8166%;width:46px;">
+			<p class="g-pstyle3">30%</p>
+		</div>
+		<div id="g-ai0-33" class="g-ai2html-settings g-aiAbs" style="top:96.3856%;left:4.0639%;width:47.9032%;">
+			<p class="g-pstyle5">source: pudding.cool/2017/07/comics</p>
+		</div>
+	</div>
+
+	<!-- Artboard: laptop -->
+	<div id="g-templates5-laptop" class="g-artboard" style="width:490px; height:459.305084745762px;" data-aspect-ratio="1.067" data-min-width="490" data-max-width="619">
+		<img id="g-templates5-laptop-img" class="g-aiImg g-aiAbs" alt="" src="templates5-laptop.png"/>
+		<div id="g-ai1-1" class="g-ai2html-settings g-aiAbs" style="top:5.6607%;left:4.0348%;width:93.6735%;">
+			<p class="g-pstyle0">Batman and Dream Girl</p>
+			<p class="g-pstyle1">10 most common gendered name-patterns of 2 400 comic characters</p>
+			<p>&nbsp;</p>
+			<p>&nbsp;</p>
+		</div>
+		<div id="g-ai1-2" class="g-ai2html-settings g-aiAbs" style="top:19.1594%;left:32.8121%;width:17.551%;">
+			<p class="g-pstyle2">Female</p>
+		</div>
+		<div id="g-ai1-3" class="g-ai2html-settings g-aiAbs" style="top:19.1594%;left:51.3633%;width:13.8776%;">
+			<p class="g-pstyle2">Male</p>
+		</div>
+		<div id="g-ai1-4" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:31.2392%;margin-top:-8.5px;left:88.708%;width:41px;">
+			<p class="g-pstyle3">man</p>
+		</div>
+		<div id="g-ai1-5" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:35.2918%;margin-top:-8.1px;left:21.8974%;width:39px;">
+			<p class="g-pstyle4">lady</p>
+		</div>
+		<div id="g-ai1-6" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:40.1658%;margin-top:-8.5px;left:75.8248%;width:35px;">
+			<p class="g-pstyle3">mr.</p>
+		</div>
+		<div id="g-ai1-7" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:40.2994%;margin-top:-8.1px;left:22.457%;width:40px;">
+			<p class="g-pstyle4">mrs.</p>
+		</div>
+		<div id="g-ai1-8" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:42.1252%;margin-top:-8.5px;left:60.6958%;width:40px;">
+			<p class="g-pstyle3">king</p>
+		</div>
+		<div id="g-ai1-9" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:45.307%;margin-top:-8.1px;left:23.6337%;width:34px;">
+			<p class="g-pstyle4">girl</p>
+		</div>
+		<div id="g-ai1-10" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:46.6974%;margin-top:-8.5px;left:58.7005%;width:38px;">
+			<p class="g-pstyle3">lord</p>
+		</div>
+		<div id="g-ai1-11" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:50.3145%;margin-top:-8.1px;left:21.0574%;width:47px;">
+			<p class="g-pstyle4">queen</p>
+		</div>
+		<div id="g-ai1-12" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:50.8341%;margin-top:-8.5px;left:58.3682%;width:51px;">
+			<p class="g-pstyle3">master</p>
+		</div>
+		<div id="g-ai1-13" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:52.1404%;margin-top:-8.5px;left:75.6095%;width:82px;">
+			<p class="g-pstyle5">Men, not boys</p>
+		</div>
+		<div id="g-ai1-14" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:54.9707%;margin-top:-8.5px;left:3.4473%;width:94px;">
+			<p class="g-pstyle5">Girls, not women</p>
+		</div>
+		<div id="g-ai1-15" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:55.3221%;margin-top:-8.1px;left:29.3476%;width:41px;">
+			<p class="g-pstyle4">miss</p>
+		</div>
+		<div id="g-ai1-16" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:55.8416%;margin-top:-8.5px;left:55.7911%;width:37px;">
+			<p class="g-pstyle3">boy</p>
+		</div>
+		<div id="g-ai1-17" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:60.3297%;margin-top:-8.1px;left:30.4638%;width:44px;">
+			<p class="g-pstyle4">sister</p>
+		</div>
+		<div id="g-ai1-18" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:60.8492%;margin-top:-8.5px;left:52.5429%;width:46px;">
+			<p class="g-pstyle3">junior</p>
+		</div>
+		<div id="g-ai1-19" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:65.3372%;margin-top:-8.1px;left:29.1076%;width:51px;">
+			<p class="g-pstyle4">woman</p>
+		</div>
+		<div id="g-ai1-20" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:66.7276%;margin-top:-8.5px;left:52.0503%;width:46px;">
+			<p class="g-pstyle3">baron</p>
+		</div>
+		<div id="g-ai1-21" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:70.5625%;margin-top:-8.1px;left:28.2757%;width:52px;">
+			<p class="g-pstyle4">madam</p>
+		</div>
+		<div id="g-ai1-22" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:72.8238%;margin-top:-8.5px;left:51.4685%;width:52px;">
+			<p class="g-pstyle3">brother</p>
+		</div>
+		<div id="g-ai1-23" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:75.5701%;margin-top:-8.1px;left:27.8275%;width:56px;">
+			<p class="g-pstyle4">princess</p>
+		</div>
+		<div id="g-ai1-24" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:79.1377%;margin-top:-8.5px;left:51.4685%;width:48px;">
+			<p class="g-pstyle3">prince</p>
+		</div>
+		<div id="g-ai1-25" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:80.5776%;margin-top:-8.1px;left:28.7423%;width:50px;">
+			<p class="g-pstyle4">mother</p>
+		</div>
+		<div id="g-ai1-26" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:91.9832%;margin-top:-8.5px;left:2.1563%;width:41px;">
+			<p class="g-pstyle3">30%</p>
+		</div>
+		<div id="g-ai1-27" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:91.9832%;margin-top:-8.5px;left:16.2961%;width:41px;">
+			<p class="g-pstyle3">20%</p>
+		</div>
+		<div id="g-ai1-28" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:91.9832%;margin-top:-8.5px;left:30.4361%;width:41px;">
+			<p class="g-pstyle3">10%</p>
+		</div>
+		<div id="g-ai1-29" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:91.9832%;margin-top:-8.5px;left:45.0278%;width:36px;">
+			<p class="g-pstyle3">0%</p>
+		</div>
+		<div id="g-ai1-30" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:91.9832%;margin-top:-8.5px;left:58.7156%;width:41px;">
+			<p class="g-pstyle3">10%</p>
+		</div>
+		<div id="g-ai1-31" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:91.9832%;margin-top:-8.5px;left:72.8556%;width:41px;">
+			<p class="g-pstyle3">20%</p>
+		</div>
+		<div id="g-ai1-32" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:91.9832%;margin-top:-8.5px;left:86.9955%;width:41px;">
+			<p class="g-pstyle3">30%</p>
+		</div>
+		<div id="g-ai1-33" class="g-ai2html-settings g-aiAbs" style="top:96.2323%;left:3.3746%;width:60.6122%;">
+			<p class="g-pstyle6">source: pudding.cool/2017/07/comics</p>
+		</div>
+	</div>
+
+	<!-- Artboard: mobile -->
+	<div id="g-templates5-mobile" class="g-artboard" style="width:375px; height:376.568805764568px;" data-aspect-ratio="0.996" data-min-width="375" data-max-width="489">
+		<img id="g-templates5-mobile-img" class="g-aiImg g-aiAbs" alt="" src="templates5-mobile.png"/>
+		<div id="g-ai2-1" class="g-ai2html-settings g-aiAbs" style="top:1.5933%;left:2.0158%;width:153.8667%;">
+			<p class="g-pstyle0">Men, not boys - Girls, not women</p>
+			<p class="g-pstyle1">10 most common gendered name-patterns of comic characters</p>
+			<p>&nbsp;</p>
+			<p>&nbsp;</p>
+		</div>
+		<div id="g-ai2-2" class="g-ai2html-settings g-aiAbs" style="top:17.5267%;left:50.9679%;width:5.8667%;">
+			<p class="g-pstyle2">%</p>
+		</div>
+		<div id="g-ai2-3" class="g-ai2html-settings g-aiAbs" style="top:18.5889%;left:29.8938%;width:28.5333%;">
+			<p class="g-pstyle3">Female</p>
+		</div>
+		<div id="g-ai2-4" class="g-ai2html-settings g-aiAbs" style="top:18.5889%;left:60.3299%;width:22.6667%;">
+			<p class="g-pstyle3">Male</p>
+		</div>
+		<div id="g-ai2-5" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:30.0451%;margin-top:-10.1px;left:49.599%;width:38px;">
+			<p class="g-pstyle4">30</p>
+		</div>
+		<div id="g-ai2-6" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:30.8303%;margin-top:-8.1px;left:62.9029%;width:45px;">
+			<p class="g-pstyle5">man</p>
+		</div>
+		<div id="g-ai2-7" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:53.1485%;margin-top:-10.1px;left:49.8656%;width:38px;">
+			<p class="g-pstyle4">20</p>
+		</div>
+		<div id="g-ai2-8" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:54.1992%;margin-top:-8.1px;left:65.663%;width:39px;">
+			<p class="g-pstyle5">mr.</p>
+		</div>
+		<div id="g-ai2-9" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:62.4314%;margin-top:-8.1px;left:39.4873%;width:39px;">
+			<p class="g-pstyle5">lady</p>
+		</div>
+		<div id="g-ai2-10" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:64.0247%;margin-top:-8.1px;left:31.0893%;width:40px;">
+			<p class="g-pstyle5">mrs.</p>
+		</div>
+		<div id="g-ai2-11" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:64.2903%;margin-top:-8.1px;left:24.2862%;width:34px;">
+			<p class="g-pstyle5">girl</p>
+		</div>
+		<div id="g-ai2-12" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:64.5558%;margin-top:-8.1px;left:12.8258%;width:47px;">
+			<p class="g-pstyle5">queen</p>
+		</div>
+		<div id="g-ai2-13" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:71.1947%;margin-top:-8.1px;left:83.7919%;width:44px;">
+			<p class="g-pstyle5">king</p>
+		</div>
+		<div id="g-ai2-14" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:73.3192%;margin-top:-8.1px;left:57.1784%;width:59px;">
+			<p class="g-pstyle5">master</p>
+		</div>
+		<div id="g-ai2-15" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:73.8503%;margin-top:-8.1px;left:71.6414%;width:42px;">
+			<p class="g-pstyle5">lord</p>
+		</div>
+		<div id="g-ai2-16" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:74.3814%;margin-top:-8.1px;left:42.3047%;width:41px;">
+			<p class="g-pstyle5">miss</p>
+		</div>
+		<div id="g-ai2-17" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:75.9863%;margin-top:-10.1px;left:49.3323%;width:38px;">
+			<p class="g-pstyle4">10</p>
+		</div>
+		<div id="g-ai2-18" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:76.2403%;margin-top:-8.1px;left:22.5753%;width:51px;">
+			<p class="g-pstyle5">woman</p>
+		</div>
+		<div id="g-ai2-19" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:76.5059%;margin-top:-8.1px;left:33.9479%;width:44px;">
+			<p class="g-pstyle5">sister</p>
+		</div>
+		<div id="g-ai2-20" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:79.9581%;margin-top:-8.1px;left:15.5031%;width:52px;">
+			<p class="g-pstyle5">madam</p>
+		</div>
+		<div id="g-ai2-21" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:80.7547%;margin-top:-8.1px;left:1.5065%;width:50px;">
+			<p class="g-pstyle5">mother</p>
+		</div>
+		<div id="g-ai2-22" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:83.6759%;margin-top:-8.1px;left:59.1294%;width:41px;">
+			<p class="g-pstyle5">boy</p>
+		</div>
+		<div id="g-ai2-23" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:86.3314%;margin-top:-8.1px;left:91.3784%;width:52px;">
+			<p class="g-pstyle5">junior</p>
+		</div>
+		<div id="g-ai2-24" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:88.4559%;margin-top:-8.1px;left:9.9091%;width:56px;">
+			<p class="g-pstyle5">princess</p>
+		</div>
+		<div id="g-ai2-25" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:91.9081%;margin-top:-8.1px;left:78.4388%;width:53px;">
+			<p class="g-pstyle5">baron</p>
+		</div>
+		<div id="g-ai2-26" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:91.908%;margin-top:-8.1px;left:51.7029%;width:55px;">
+			<p class="g-pstyle5">prince</p>
+		</div>
+		<div id="g-ai2-27" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:92.7047%;margin-top:-8.1px;left:65.0346%;width:60px;">
+			<p class="g-pstyle5">brother</p>
+		</div>
+		<div id="g-ai2-28" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:97.7259%;margin-top:-6px;left:2.4458%;width:142px;">
+			<p class="g-pstyle6">source: pudding.cool/2017/07/comics/</p>
+		</div>
+	</div>
+
+</div>
+
+<!-- End ai2html - 2019-09-13 20:56 -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            </div>
+        </div>
+    </div>
+
+    <div class="story-body">
+        <p class="body-text serif">One cannot be a super hero without powers,right? For both, female and male characters these powers then to be physical. But when we see a super hero who has mental powers such as telepahty and empathy (yes, empathy is a super power), the hero tens to be a woman. </p>
+        <p class="body-text serif"></p>
+    </div>
+      
+    
+    <div class="chart-section">
+        <div class="chart-row">
+          <div class="chart">
+
+
+            <!--- PASTE YOUR AI2HTML AFTER THIS LINE -->
+
+
+
+<!-- Generated by ai2html v0.89.0 - 2019-09-13 20:44 -->
+<!-- ai file: templates4.ai -->
+<style type='text/css' media='screen,print'>
+	#g-templates4-box .g-artboard {
+		margin:0 auto;
+	}
+	#g-templates4-box p {
+		margin:0;
+	}
+	.g-aiAbs {
+		position:absolute;
+	}
+	.g-aiImg {
+		display:block;
+		width:100% !important;
+	}
+	.g-aiSymbol {
+		position: absolute;
+		box-sizing: border-box;
+	}
+	.g-aiPointText p { white-space: nowrap; }
+	#g-templates4-medium {
+		position:relative;
+		overflow:hidden;
+	}
+	#g-templates4-medium p {
+		font-family:arial,helvetica,sans-serif;
+		font-weight:bold;
+		font-size:16px;
+		line-height:19px;
+		filter:alpha(opacity=100);
+		-ms-filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
+		opacity:1;
+		letter-spacing:0em;
+		text-align:left;
+		color:rgb(0,0,0);
+		text-transform:none;
+		padding-bottom:0;
+		padding-top:0;
+		mix-blend-mode:normal;
+		font-style:normal;
+		height:auto;
+		position:static;
+	}
+	#g-templates4-medium .g-pstyle0 {
+		font-size:18px;
+		line-height:21px;
+		height:21px;
+	}
+	#g-templates4-medium .g-pstyle1 {
+		font-size:18px;
+		line-height:21px;
+	}
+	#g-templates4-medium .g-pstyle2 {
+		font-size:11px;
+		line-height:14px;
+	}
+	#g-templates4-medium .g-cstyle0 {
+		color:rgb(237,182,50);
+	}
+	#g-templates4-medium .g-cstyle1 {
+		color:rgb(37,84,115);
+	}
+	#g-templates4-laptop {
+		position:relative;
+		overflow:hidden;
+	}
+	#g-templates4-laptop p {
+		font-family:arial,helvetica,sans-serif;
+		font-weight:bold;
+		font-size:16px;
+		line-height:19px;
+		filter:alpha(opacity=100);
+		-ms-filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
+		opacity:1;
+		letter-spacing:0em;
+		text-align:left;
+		color:rgb(0,0,0);
+		text-transform:none;
+		padding-bottom:0;
+		padding-top:0;
+		mix-blend-mode:normal;
+		font-style:normal;
+		height:auto;
+		position:static;
+	}
+	#g-templates4-laptop .g-pstyle0 {
+		font-size:15px;
+		line-height:18px;
+		height:18px;
+	}
+	#g-templates4-laptop .g-pstyle1 {
+		font-size:15px;
+		line-height:18px;
+	}
+	#g-templates4-laptop .g-pstyle2 {
+		font-size:10px;
+		line-height:11px;
+	}
+	#g-templates4-laptop .g-cstyle0 {
+		color:rgb(37,84,115);
+	}
+	#g-templates4-laptop .g-cstyle1 {
+		color:rgb(237,182,50);
+	}
+	#g-templates4-mobile {
+		position:relative;
+		overflow:hidden;
+	}
+	#g-templates4-mobile p {
+		font-family:arial,helvetica,sans-serif;
+		font-weight:bold;
+		font-size:16px;
+		line-height:19px;
+		filter:alpha(opacity=100);
+		-ms-filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
+		opacity:1;
+		letter-spacing:0em;
+		text-align:left;
+		color:rgb(0,0,0);
+		text-transform:none;
+		padding-bottom:0;
+		padding-top:0;
+		mix-blend-mode:normal;
+		font-style:normal;
+		height:auto;
+		position:static;
+	}
+	#g-templates4-mobile .g-pstyle0 {
+		font-size:11px;
+		line-height:14px;
+		height:14px;
+	}
+	#g-templates4-mobile .g-pstyle1 {
+		font-size:12px;
+		line-height:14px;
+		height:14px;
+	}
+	#g-templates4-mobile .g-pstyle2 {
+		font-size:11px;
+		line-height:14px;
+	}
+	#g-templates4-mobile .g-pstyle3 {
+		font-size:9px;
+		line-height:11px;
+	}
+	#g-templates4-mobile .g-cstyle0 {
+		color:rgb(37,84,115);
+	}
+	#g-templates4-mobile .g-cstyle1 {
+		color:rgb(237,182,50);
+	}
+
+</style>
+
+<div id="g-templates4-box" class="ai2html">
+
+	<!-- Artboard: medium -->
+	<div id="g-templates4-medium" class="g-artboard" style="width:620px; height:425px;" data-aspect-ratio="1.459" data-min-width="620">
+		<img id="g-templates4-medium-img" class="g-aiImg g-aiAbs" alt="" src="templates4-medium.png"/>
+		<div id="g-ai0-1" class="g-ai2html-settings g-aiAbs" style="top:5.6471%;left:9.997%;width:78.871%;">
+			<p>Mental powers for comic characters are rare,</p>
+			<p><span class="g-cstyle0">female characters</span> have them more often than <span class="g-cstyle1">male</span></p>
+		</div>
+		<div id="g-ai0-2" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:26.3473%;margin-top:-12px;left:9.2755%;width:44px;">
+			<p class="g-pstyle0">80</p>
+		</div>
+		<div id="g-ai0-3" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:41.4061%;margin-top:-12px;left:9.2755%;width:44px;">
+			<p class="g-pstyle0">60</p>
+		</div>
+		<div id="g-ai0-4" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:56.2297%;margin-top:-12px;left:9.2755%;width:44px;">
+			<p class="g-pstyle0">40</p>
+		</div>
+		<div id="g-ai0-5" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:71.2885%;margin-top:-12px;left:9.2755%;width:44px;">
+			<p class="g-pstyle0">20</p>
+		</div>
+		<div id="g-ai0-6" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:86.112%;margin-top:-12px;left:10.7361%;width:33px;">
+			<p class="g-pstyle0">0</p>
+		</div>
+		<div id="g-ai0-7" class="g-ai2html-settings g-aiAbs" style="top:84.2353%;left:4.5524%;width:5.8065%;">
+			<p class="g-pstyle1">%</p>
+		</div>
+		<div id="g-ai0-8" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:90.8179%;margin-top:-12px;left:23.3259%;width:152px;">
+			<p class="g-pstyle0">Mental powers</p>
+		</div>
+		<div id="g-ai0-9" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:90.8179%;margin-top:-12px;left:61.5431%;width:166px;">
+			<p class="g-pstyle0">Physical powers</p>
+		</div>
+		<div id="g-ai0-10" class="g-ai2html-settings g-aiAbs" style="top:96.7059%;left:56.4557%;width:47.9032%;">
+			<p class="g-pstyle2">source: pudding.cool/2017/07/comics</p>
+		</div>
+	</div>
+
+	<!-- Artboard: laptop -->
+	<div id="g-templates4-laptop" class="g-artboard" style="width:490px; height:369.525423728814px;" data-aspect-ratio="1.326" data-min-width="490" data-max-width="619">
+		<img id="g-templates4-laptop-img" class="g-aiImg g-aiAbs" alt="" src="templates4-laptop.png"/>
+		<div id="g-ai1-1" class="g-ai2html-settings g-aiAbs" style="top:NaN%;left:3.1453%;width:101.0204%;">
+			<p>&nbsp;</p>
+			<p><span class="g-cstyle0">Female characters</span> have mental powers </p>
+			<p>more often than <span class="g-cstyle1">male</span></p>
+		</div>
+		<div id="g-ai1-2" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:29.8516%;margin-top:-10.3px;left:4.1371%;width:42px;">
+			<p class="g-pstyle0">80</p>
+		</div>
+		<div id="g-ai1-3" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:44.1943%;margin-top:-10.3px;left:4.1371%;width:42px;">
+			<p class="g-pstyle0">60</p>
+		</div>
+		<div id="g-ai1-4" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:58.8076%;margin-top:-10.3px;left:4.1371%;width:42px;">
+			<p class="g-pstyle0">40</p>
+		</div>
+		<div id="g-ai1-5" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:73.1502%;margin-top:-10.3px;left:4.1371%;width:42px;">
+			<p class="g-pstyle0">20</p>
+		</div>
+		<div id="g-ai1-6" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:87.7635%;margin-top:-10.3px;left:5.765%;width:32px;">
+			<p class="g-pstyle0">0</p>
+		</div>
+		<div id="g-ai1-7" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:92.0934%;margin-top:-10.3px;left:19.7962%;width:136px;">
+			<p class="g-pstyle0">Mental powers</p>
+		</div>
+		<div id="g-ai1-8" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:92.0934%;margin-top:-10.3px;left:62.3891%;width:149px;">
+			<p class="g-pstyle0">Physical powers</p>
+		</div>
+		<div id="g-ai1-9" class="g-ai2html-settings g-aiAbs" style="top:91.7393%;left:4.9957%;width:6.5306%;">
+			<p class="g-pstyle1">%</p>
+		</div>
+		<div id="g-ai1-10" class="g-ai2html-settings g-aiAbs" style="top:96.881%;left:56.7192%;width:53.4694%;">
+			<p class="g-pstyle2">source: pudding.cool/2017/07/comics</p>
+		</div>
+	</div>
+
+	<!-- Artboard: mobile -->
+	<div id="g-templates4-mobile" class="g-artboard" style="width:375px; height:265.80310880829px;" data-aspect-ratio="1.411" data-min-width="375" data-max-width="489">
+		<img id="g-templates4-mobile-img" class="g-aiImg g-aiAbs" alt="" src="templates4-mobile.png"/>
+		<div id="g-ai2-1" class="g-ai2html-settings g-aiAbs" style="top:NaN%;left:3.3491%;width:132%;">
+			<p>&nbsp;</p>
+			<p><span class="g-cstyle0">Female characters</span> have mental powers </p>
+			<p>more often than <span class="g-cstyle1">male</span></p>
+		</div>
+		<div id="g-ai2-2" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:24.5322%;margin-top:-8.2px;left:2.8729%;width:37px;">
+			<p class="g-pstyle0">80</p>
+		</div>
+		<div id="g-ai2-3" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:39.9571%;margin-top:-8.2px;left:2.8729%;width:37px;">
+			<p class="g-pstyle0">60</p>
+		</div>
+		<div id="g-ai2-4" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:55.3821%;margin-top:-8.2px;left:2.8729%;width:37px;">
+			<p class="g-pstyle0">40</p>
+		</div>
+		<div id="g-ai2-5" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:70.4308%;margin-top:-8.2px;left:2.8729%;width:37px;">
+			<p class="g-pstyle0">20</p>
+		</div>
+		<div id="g-ai2-6" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:85.8559%;margin-top:-8.2px;left:4.5393%;width:30px;">
+			<p class="g-pstyle0">0</p>
+		</div>
+		<div id="g-ai2-7" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:90.329%;margin-top:-8.1px;left:18.9037%;width:117px;">
+			<p class="g-pstyle1">Mental powers</p>
+		</div>
+		<div id="g-ai2-8" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:90.329%;margin-top:-8.1px;left:62.5065%;width:127px;">
+			<p class="g-pstyle1">Physical powers</p>
+		</div>
+		<div id="g-ai2-9" class="g-ai2html-settings g-aiAbs" style="top:90.2924%;left:3.752%;width:6.6667%;">
+			<p class="g-pstyle2">%</p>
+		</div>
+		<div id="g-ai2-10" class="g-ai2html-settings g-aiAbs" style="top:95.9357%;left:50.0358%;width:54.6667%;">
+			<p class="g-pstyle3">source: pudding.cool/2017/07/comics</p>
+		</div>
+	</div>
+
+</div>
+
+<!-- End ai2html - 2019-09-13 20:44 -->
+
+
+
+
+
+        </div>
+    </div>
+</div>
+
+<div class="story-body">
+    <p class="body-text serif">In any case, the clear majority of female comic super heros has physical super powers instead of mental ones. One of the reasons might be that physical powers are easier and more intresting to draw than, let's say, telepathy. And they just might be more fun to have. Here are the powers that are most typical for female characters. </p>
+    <p class="body-text serif">Interesting, that there are so few male characters who would have grabby hair or who would be able to control feromones, isn't it? I would say only a true super hero can do that.</p>
+</div>
+  
+<div class="chart-section">
+    <div class="chart-row">
+      <div class="chart">
+
+
+
+
+
+            <!--- PASTE YOUR AI2HTML AFTER THIS LINE -->
+
+
+<!-- Generated by ai2html v0.89.0 - 2019-09-13 15:32 -->
+<!-- ai file: templates6.ai -->
+<style type='text/css' media='screen,print'>
+	#g-templates6-box .g-artboard {
+		margin:0 auto;
+	}
+	#g-templates6-box p {
+		margin:0;
+	}
+	.g-aiAbs {
+		position:absolute;
+	}
+	.g-aiImg {
+		display:block;
+		width:100% !important;
+	}
+	.g-aiSymbol {
+		position: absolute;
+		box-sizing: border-box;
+	}
+	.g-aiPointText p { white-space: nowrap; }
+	#g-templates6-medium {
+		position:relative;
+		overflow:hidden;
+	}
+	#g-templates6-medium p {
+		font-family:arial,helvetica,sans-serif;
+		font-size:12px;
+		line-height:14px;
+		height:auto;
+		filter:alpha(opacity=100);
+		-ms-filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
+		opacity:1;
+		letter-spacing:0em;
+		text-align:left;
+		color:rgb(0,0,0);
+		text-transform:none;
+		padding-bottom:0;
+		padding-top:0;
+		mix-blend-mode:normal;
+		font-style:normal;
+		position:static;
+	}
+	#g-templates6-medium .g-pstyle0 {
+		font-weight:bold;
+		font-size:18px;
+		line-height:22px;
+	}
+	#g-templates6-medium .g-pstyle1 {
+		font-size:14px;
+		line-height:17px;
+	}
+	#g-templates6-medium .g-pstyle2 {
+		height:14px;
+		color:rgb(37,84,115);
+	}
+	#g-templates6-medium .g-pstyle3 {
+		height:14px;
+	}
+	#g-templates6-medium .g-pstyle4 {
+		font-size:14px;
+		line-height:17px;
+		height:17px;
+	}
+	#g-templates6-medium .g-pstyle5 {
+		font-size:9px;
+		line-height:11px;
+	}
+	#g-templates6-medium .g-cstyle0 {
+		color:rgb(96,96,96);
+	}
+	#g-templates6-medium .g-cstyle1 {
+		font-size:14px;
+	}
+	#g-templates6-medium .g-cstyle2 {
+		color:rgb(237,182,50);
+	}
+	#g-templates6-medium .g-cstyle3 {
+		color:rgb(37,84,115);
+	}
+	#g-templates6-medium .g-cstyle4 {
+		color:rgb(0,0,0);
+	}
+	#g-templates6-laptop {
+		position:relative;
+		overflow:hidden;
+	}
+	#g-templates6-laptop p {
+		font-family:arial,helvetica,sans-serif;
+		font-size:12px;
+		line-height:14px;
+		height:auto;
+		filter:alpha(opacity=100);
+		-ms-filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
+		opacity:1;
+		letter-spacing:0em;
+		text-align:left;
+		color:rgb(0,0,0);
+		text-transform:none;
+		padding-bottom:0;
+		padding-top:0;
+		mix-blend-mode:normal;
+		font-style:normal;
+		position:static;
+	}
+	#g-templates6-laptop .g-pstyle0 {
+		font-weight:bold;
+		font-size:17px;
+		line-height:21px;
+	}
+	#g-templates6-laptop .g-pstyle1 {
+		font-size:15px;
+		line-height:18px;
+	}
+	#g-templates6-laptop .g-pstyle2 {
+		height:14px;
+		color:rgb(37,84,115);
+	}
+	#g-templates6-laptop .g-pstyle3 {
+		height:14px;
+	}
+	#g-templates6-laptop .g-pstyle4 {
+		font-size:13px;
+		line-height:16px;
+		height:16px;
+	}
+	#g-templates6-laptop .g-pstyle5 {
+		font-size:11px;
+	}
+	#g-templates6-laptop .g-pstyle6 {
+		font-size:9px;
+		line-height:10px;
+	}
+	#g-templates6-laptop .g-cstyle0 {
+		color:rgb(96,96,96);
+	}
+	#g-templates6-laptop .g-cstyle1 {
+		font-size:13px;
+	}
+	#g-templates6-laptop .g-cstyle2 {
+		color:rgb(237,182,50);
+	}
+	#g-templates6-laptop .g-cstyle3 {
+		color:rgb(37,84,115);
+	}
+	#g-templates6-mobile {
+		position:relative;
+		overflow:hidden;
+	}
+	#g-templates6-mobile p {
+		font-family:arial,helvetica,sans-serif;
+		font-weight:bold;
+		font-size:16px;
+		line-height:19px;
+		filter:alpha(opacity=100);
+		-ms-filter:progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
+		opacity:1;
+		letter-spacing:0em;
+		text-align:left;
+		color:rgb(0,0,0);
+		text-transform:none;
+		padding-bottom:0;
+		padding-top:0;
+		mix-blend-mode:normal;
+		font-style:normal;
+		height:auto;
+		position:static;
+	}
+	#g-templates6-mobile .g-pstyle0 {
+		font-size:13px;
+		line-height:16px;
+		height:16px;
+	}
+	#g-templates6-mobile .g-pstyle1 {
+		font-size:11px;
+		line-height:14px;
+	}
+	#g-templates6-mobile .g-pstyle2 {
+		font-size:8px;
+		line-height:10px;
+		height:10px;
+	}
+	#g-templates6-mobile .g-cstyle0 {
+		color:rgb(37,84,115);
+	}
+	#g-templates6-mobile .g-cstyle1 {
+		color:rgb(237,182,50);
+	}
+
+</style>
+
+<div id="g-templates6-box" class="ai2html">
+
+	<!-- Artboard: medium -->
+	<div id="g-templates6-medium" class="g-artboard" style="width:620px; height:449.237288135593px;" data-aspect-ratio="1.38" data-min-width="620">
+		<img id="g-templates6-medium-img" class="g-aiImg g-aiAbs" alt="" src="templates6-medium.png"/>
+		<div id="g-ai0-1" class="g-ai2html-settings g-aiAbs" style="top:0.6678%;left:8.5001%;width:88.0645%;">
+			<p class="g-pstyle0">Women<span class="g-cstyle0"> </span>Can Fly, Cry and Toss Their Hair<span class="g-cstyle1"> </span></p>
+			<p class="g-pstyle1">Supernatural powers of <span class="g-cstyle2">male </span>and <span class="g-cstyle3">female </span>comic characters, more female powers highlighted in blue</p>
+			<p>&nbsp;</p>
+		</div>
+		<div id="g-ai0-2" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:19.833%;margin-top:-8.1px;left:7.673%;width:51px;">
+			<p class="g-pstyle2">Flight</p>
+		</div>
+		<div id="g-ai0-3" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:25.1754%;margin-top:-8.1px;left:7.673%;width:95px;">
+			<p class="g-pstyle3">Invulnerability</p>
+		</div>
+		<div id="g-ai0-4" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:30.2952%;margin-top:-8.1px;left:7.6735%;width:69px;">
+			<p class="g-pstyle3">Adaptive</p>
+		</div>
+		<div id="g-ai0-5" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:35.415%;margin-top:-8.1px;left:7.673%;width:49px;">
+			<p class="g-pstyle3">Feral</p>
+		</div>
+		<div id="g-ai0-6" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:40.7573%;margin-top:-8.1px;left:7.673%;width:83px;">
+			<p class="g-pstyle3">Heat Vision</p>
+		</div>
+		<div id="g-ai0-7" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:45.8771%;margin-top:-8.1px;left:7.0961%;width:135px;">
+			<p class="g-pstyle3">Genetic Manipulation</p>
+		</div>
+		<div id="g-ai0-8" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:50.9969%;margin-top:-8.1px;left:7.673%;width:97px;">
+			<p class="g-pstyle2">Sonic Scream</p>
+		</div>
+		<div id="g-ai0-9" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:56.1167%;margin-top:-8.1px;left:7.673%;width:126px;">
+			<p class="g-pstyle2">Pheromone Contro<span class="g-cstyle4">l</span></p>
+		</div>
+		<div id="g-ai0-10" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:61.4591%;margin-top:-8.1px;left:7.673%;width:81px;">
+			<p class="g-pstyle3">Magnetism</p>
+		</div>
+		<div id="g-ai0-11" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:66.5789%;margin-top:-8.1px;left:7.673%;width:94px;">
+			<p class="g-pstyle3">Flame Breath</p>
+		</div>
+		<div id="g-ai0-12" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:71.6987%;margin-top:-8.1px;left:7.673%;width:81px;">
+			<p class="g-pstyle3">Duplication</p>
+		</div>
+		<div id="g-ai0-13" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:77.0411%;margin-top:-8.1px;left:7.673%;width:104px;">
+			<p class="g-pstyle2">Prehensile Hair</p>
+		</div>
+		<div id="g-ai0-14" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:82.1608%;margin-top:-8.1px;left:7.673%;width:117px;">
+			<p class="g-pstyle3">Matter Absorption</p>
+		</div>
+		<div id="g-ai0-15" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:87.2806%;margin-top:-8.1px;left:7.673%;width:119px;">
+			<p class="g-pstyle3">Enhance Mutation</p>
+		</div>
+		<div id="g-ai0-16" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:92.1073%;margin-top:-9.8px;left:25.6544%;width:30px;">
+			<p class="g-pstyle4">0</p>
+		</div>
+		<div id="g-ai0-17" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:92.1073%;margin-top:-9.8px;left:43.9918%;width:30px;">
+			<p class="g-pstyle4">5</p>
+		</div>
+		<div id="g-ai0-18" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:92.1073%;margin-top:-9.8px;left:61.8165%;width:38px;">
+			<p class="g-pstyle4">10</p>
+		</div>
+		<div id="g-ai0-19" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:92.1073%;margin-top:-9.8px;left:80.154%;width:38px;">
+			<p class="g-pstyle4">15</p>
+		</div>
+		<div id="g-ai0-20" class="g-ai2html-settings g-aiAbs" style="top:90.8206%;left:95.7937%;width:2.5806%;">
+			<p>%</p>
+		</div>
+		<div id="g-ai0-21" class="g-ai2html-settings g-aiAbs" style="top:96.6082%;left:1.283%;width:33.7097%;">
+			<p class="g-pstyle5">source: pudding.cool/2017/07/comics</p>
+		</div>
+	</div>
+
+	<!-- Artboard: laptop -->
+	<div id="g-templates6-laptop" class="g-artboard" style="width:490px; height:459.305084745762px;" data-aspect-ratio="1.067" data-min-width="490" data-max-width="619">
+		<img id="g-templates6-laptop-img" class="g-aiImg g-aiAbs" alt="" src="templates6-laptop.png"/>
+		<div id="g-ai1-1" class="g-ai2html-settings g-aiAbs" style="top:1.9595%;left:5.4596%;width:83.0612%;">
+			<p class="g-pstyle0">Women<span class="g-cstyle0"> </span>Can Fly, Cry and Toss Their Hair<span class="g-cstyle1"> </span></p>
+			<p class="g-pstyle1">Supernatural powers of <span class="g-cstyle2">male </span>and <span class="g-cstyle3">female </span>comic characters, more female powers highlighted in blue</p>
+			<p>&nbsp;</p>
+		</div>
+		<div id="g-ai1-2" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:19.8337%;margin-top:-8.1px;left:4.1364%;width:45px;">
+			<p class="g-pstyle2">Flight</p>
+		</div>
+		<div id="g-ai1-3" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:24.6235%;margin-top:-8.1px;left:4.1364%;width:79px;">
+			<p class="g-pstyle3">Invulnerability</p>
+		</div>
+		<div id="g-ai1-4" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:29.4134%;margin-top:-8.1px;left:4.1366%;width:58px;">
+			<p class="g-pstyle3">Adaptive</p>
+		</div>
+		<div id="g-ai1-5" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:34.2032%;margin-top:-8.1px;left:4.1364%;width:43px;">
+			<p class="g-pstyle3">Feral</p>
+		</div>
+		<div id="g-ai1-6" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:39.2108%;margin-top:-8.1px;left:4.1364%;width:70px;">
+			<p class="g-pstyle3">Heat Vision</p>
+		</div>
+		<div id="g-ai1-7" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:44.0006%;margin-top:-8.1px;left:4.1364%;width:92px;">
+			<p class="g-pstyle3">Genetic Manipul.</p>
+		</div>
+		<div id="g-ai1-8" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:48.7905%;margin-top:-8.1px;left:4.1364%;width:80px;">
+			<p class="g-pstyle2">Sonic Scream</p>
+		</div>
+		<div id="g-ai1-9" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:53.5803%;margin-top:-8.1px;left:4.1364%;width:88px;">
+			<p class="g-pstyle2">Pheromone Ctrl</p>
+		</div>
+		<div id="g-ai1-10" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:58.5879%;margin-top:-8.1px;left:4.1364%;width:68px;">
+			<p class="g-pstyle3">Magnetism</p>
+		</div>
+		<div id="g-ai1-11" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:63.3777%;margin-top:-8.1px;left:4.1364%;width:78px;">
+			<p class="g-pstyle3">Flame Breath</p>
+		</div>
+		<div id="g-ai1-12" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:68.1676%;margin-top:-8.1px;left:4.1364%;width:68px;">
+			<p class="g-pstyle3">Duplication</p>
+		</div>
+		<div id="g-ai1-13" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:72.9574%;margin-top:-8.1px;left:4.1364%;width:86px;">
+			<p class="g-pstyle2">Prehensile Hair</p>
+		</div>
+		<div id="g-ai1-14" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:77.965%;margin-top:-8.1px;left:4.1364%;width:86px;">
+			<p class="g-pstyle3">Matter Absorpt.</p>
+		</div>
+		<div id="g-ai1-15" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:82.7548%;margin-top:-8.1px;left:4.1364%;width:88px;">
+			<p class="g-pstyle3">Enhance Mutat.</p>
+		</div>
+		<div id="g-ai1-16" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:87.3934%;margin-top:-9.4px;left:21.6277%;width:28px;">
+			<p class="g-pstyle4">0</p>
+		</div>
+		<div id="g-ai1-17" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:87.3934%;margin-top:-9.4px;left:38.911%;width:28px;">
+			<p class="g-pstyle4">5</p>
+		</div>
+		<div id="g-ai1-18" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:87.3934%;margin-top:-9.4px;left:55.711%;width:34px;">
+			<p class="g-pstyle4">10</p>
+		</div>
+		<div id="g-ai1-19" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:87.3934%;margin-top:-9.4px;left:72.9945%;width:34px;">
+			<p class="g-pstyle4">15</p>
+		</div>
+		<div id="g-ai1-20" class="g-ai2html-settings g-aiAbs" style="top:85.7818%;left:87.7351%;width:2.449%;">
+			<p class="g-pstyle5">%</p>
+		</div>
+		<div id="g-ai1-21" class="g-ai2html-settings g-aiAbs" style="top:92.5311%;left:66.2335%;width:33.6735%;">
+			<p class="g-pstyle6">source: pudding.cool/2017/07/comics</p>
+		</div>
+	</div>
+
+	<!-- Artboard: mobile -->
+	<div id="g-templates6-mobile" class="g-artboard" style="width:375px; height:357.406779661017px;" data-aspect-ratio="1.049" data-min-width="375" data-max-width="489">
+		<img id="g-templates6-mobile-img" class="g-aiImg g-aiAbs" alt="" src="templates6-mobile.png"/>
+		<div id="g-ai2-1" class="g-ai2html-settings g-aiAbs" style="top:0.2798%;left:0.6246%;width:100.2667%;">
+			<p>Supernatural powers that are more common </p>
+			<p>for <span class="g-cstyle0">female</span> than <span class="g-cstyle1">male </span>comic characters </p>
+			<p>&nbsp;</p>
+			<p>&nbsp;</p>
+		</div>
+		<div id="g-ai2-2" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:19.6383%;margin-top:-9.2px;left:0.6%;width:49px;">
+			<p class="g-pstyle0">Flight</p>
+		</div>
+		<div id="g-ai2-3" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:39.4477%;margin-top:-17px;left:0.6%;width:60px;">
+			<p class="g-pstyle0">Sonic</p>
+			<p class="g-pstyle0">Scream</p>
+		</div>
+		<div id="g-ai2-4" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:58.7533%;margin-top:-17px;left:0.6%;width:79px;">
+			<p class="g-pstyle0">Pheromone</p>
+			<p class="g-pstyle0">Control</p>
+		</div>
+		<div id="g-ai2-5" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:78.6186%;margin-top:-17px;left:0.6%;width:58px;">
+			<p class="g-pstyle0">Grabby</p>
+			<p class="g-pstyle0"> Hair</p>
+		</div>
+		<div id="g-ai2-6" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:92.1285%;margin-top:-9.3px;left:20.2242%;width:28px;">
+			<p class="g-pstyle0">0</p>
+		</div>
+		<div id="g-ai2-7" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:92.1285%;margin-top:-9.3px;left:43.5159%;width:28px;">
+			<p class="g-pstyle0">5</p>
+		</div>
+		<div id="g-ai2-8" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:92.1285%;margin-top:-9.3px;left:66.9341%;width:34px;">
+			<p class="g-pstyle0">10</p>
+		</div>
+		<div id="g-ai2-9" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:92.1285%;margin-top:-9.3px;left:91.0263%;width:34px;">
+			<p class="g-pstyle0">15</p>
+		</div>
+		<div id="g-ai2-10" class="g-ai2html-settings g-aiAbs" style="top:90.3732%;left:14.4348%;width:3.4667%;">
+			<p class="g-pstyle1">%</p>
+		</div>
+		<div id="g-ai2-11" class="g-ai2html-settings g-aiAbs g-aiPointText" style="top:98.2089%;margin-top:-6px;left:67.3143%;width:142px;">
+			<p class="g-pstyle2">source: pudding.cool/2017/07/comics/</p>
+		</div>
+	</div>
+
+</div>
+
+<!-- End ai2html - 2019-09-13 15:32 -->
+
+
+
+
+        </div>
+    </div>
+</div>
+
+<div class="story-body">
+    <p class="body-text serif">The original story "Analyzing the Gender Representation of 34,476 Comic Book Characters", can be found at 
+        <a href="https://pudding.cool/2017/07/comics" target="_blank">Pudding</a> 
+        </p>
+    <p class="body-text serif"></p>
+</div>
+
+<div class="chart-section">
+    <div class="chart-row">
+      <div class="chart">
+
+</body>
+</html>
